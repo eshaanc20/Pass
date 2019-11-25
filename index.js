@@ -6,12 +6,12 @@ const fs = require('fs');
 var readlineSync = require('readline-sync');
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('key');
-var readFile = (fs.readFileSync("pass.txt")).toString();
 
 yargs.command({
     command: 'init',
     describe: 'Initializing the module',
     handler: function () {
+        fs.writeFileSync('pass.txt');
         var readFile = (fs.readFileSync("pass.txt")).toString();
         console.log(chalk.blue.bold("Pass"));
         console.log("Password manager using the terminal");
