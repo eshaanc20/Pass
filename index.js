@@ -4,13 +4,13 @@ const chalk = require('chalk');
 const yargs = require('yargs');
 const fs = require('fs');
 var readlineSync = require('readline-sync');
-var encryptor = require('file-encryptor');
-
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('key');
 var readFile = (fs.readFileSync("pass.txt")).toString();
 
 yargs.command({
     command: 'init',
-    describe: 'Start application',
+    describe: 'Initializing the module',
     handler: function () {
         var readFile = (fs.readFileSync("pass.txt")).toString();
         console.log(chalk.blue.bold("Pass"));
@@ -19,7 +19,8 @@ yargs.command({
         let pass = readlineSync.question("Password: ");
         let object = {username: user, password: pass};
         let JSONdata = JSON.stringify(object);
-        fs.writeFileSync('pass.txt', JSONdata);
+        const encryptedString = cryptr.encrypt(JSONdata);
+        fs.writeFileSync('pass.txt', encryptedString);
     }
 })
 
@@ -28,24 +29,29 @@ yargs.command({
     describe: 'Add new password',
     builder: {
     },
-    handler: function (argv) {
+    handler: function () {
         console.log(chalk.blue.bold("Pass"));
         var readFile = (fs.readFileSync("pass.txt")).toString();
-        let data = JSON.parse(readFile);
-        let pass = readlineSync.question("Password: ");
-        if (pass == data.password) {
-            console.log();
-            console.log(chalk.bold("Hello " + data.username))
-            console.log(chalk.blue.bold("New Password"))
-            let newApplication = readlineSync.question("Application: ");
-            let newPassword = readlineSync.question("Password: ");
-            data[newApplication] = newPassword;
-            let JSONdata = JSON.stringify(data);
-            fs.writeFileSync('pass.txt', JSONdata);
-            console.log(chalk.green("New password added"))
-        } else (
-            console.log(chalk.red("Incorrect password"))
-        )
+        if (readFile == '') {
+            console.log("Run the command pass init")
+        } else {
+            const decryptedString = cryptr.decrypt(readFile);
+            let data = JSON.parse(decryptedString);
+            let pass = readlineSync.question("Password: ", {hideEchoBack: true});
+            if (pass == data.password) {
+                console.log();
+                console.log(chalk.bold("Hello " + data.username + ", which new password do you want to add?"))
+                let newApplication = readlineSync.question("Application: ");
+                let newPassword = readlineSync.question("Password: ");
+                data[newApplication] = newPassword;
+                let JSONdata = JSON.stringify(data);
+                const encryptedString = cryptr.encrypt(JSONdata);
+                fs.writeFileSync('pass.txt', encryptedString);
+                console.log(chalk.green("New password added"))
+            } else (
+                console.log(chalk.red("Incorrect password"))
+            )
+        }
     }
 })
 
@@ -54,11 +60,93 @@ yargs.command({
     describe: 'Remove password',
     builder: {
     },
-    handler: function (argv) {
-        let options = ['Add', 'Remove', 'View']
-        let option = readlineSync.question(options, "Which option");
+    handler: function () {
+        console.log(chalk.blue.bold("Pass"));
+        var readFile = (fs.readFileSync("pass.txt")).toString();
+        if (readFile == '') {
+            console.log("Run the command pass init")
+        } else {
+            const decryptedString = cryptr.decrypt(readFile);
+            let data = JSON.parse(decryptedString);
+            let pass = readlineSync.question("Password: ", {hideEchoBack: true});
+            if (pass == data.password) {
+                console.log();
+                console.log(chalk.bold("Hello " + data.username + ", which password do you want to remove?"))
+                let application = readlineSync.question("Application: ");
+                if (data[application] == undefined) {
+                    console.log(chalk.red("Password does not exist"));
+                } else {
+                    delete data[application]
+                    let JSONdata = JSON.stringify(data);
+                    const encryptedString = cryptr.encrypt(JSONdata);
+                    fs.writeFileSync('pass.txt', encryptedString);
+                    console.log(chalk.red("Password removed"))
+                }
+            } else (
+                console.log(chalk.red("Incorrect password"))
+            )
+        }
     }
 })
 
+yargs.command({
+    command: 'get',
+    describe: 'Get password',
+    builder: {
+    },
+    handler: function () {
+        if (readFile == '') {
+            console.log("Run the command pass init")
+        } else {
+            console.log(chalk.blue.bold("Pass"));
+            var readFile = (fs.readFileSync("pass.txt")).toString();
+            const decryptedString = cryptr.decrypt(readFile);
+            let data = JSON.parse(decryptedString);
+            let pass = readlineSync.question("Password: ", {hideEchoBack: true});
+            if (pass == data.password) {
+                console.log();
+                console.log(chalk.green("Hello " + data.username + ", which password do you want to get?"))
+                let application = readlineSync.question("Application: ");
+                if (data[application] == undefined) {
+                    console.log(chalk.red("Password does not exist"));
+                } else {
+                    console.log("Password: " + data[application]);
+                }
+            } else (
+                console.log(chalk.red("Incorrect password"))
+            )
+        }
+    }
+})
+
+yargs.command({
+    command: 'view',
+    describe: 'View all applications',
+    builder: {
+    },
+    handler: function (argv) {
+        console.log(chalk.blue.bold("Pass"));
+        var readFile = (fs.readFileSync("pass.txt")).toString();
+        if (readFile == '') {
+            console.log("Run the command pass init")
+        } else {
+            const decryptedString = cryptr.decrypt(readFile);
+            let data = JSON.parse(decryptedString);
+            let pass = readlineSync.question("Password: ", {hideEchoBack: true});
+            if (pass == data.password) {
+                console.log();
+                console.log(chalk.bold("Hello " + data.username + ", the following are all the application you have added."));
+                let applications = Object.keys(data);
+                applications.map((application, index) => {
+                    if (index != 0 && index != 1) {
+                        console.log(application);
+                    }
+                })
+            } else (
+                console.log(chalk.red("Incorrect password"))
+            )
+        }
+    }
+})
 
 yargs.parse()
