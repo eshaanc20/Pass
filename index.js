@@ -31,10 +31,10 @@ yargs.command({
     },
     handler: function () {
         console.log(chalk.blue.bold("Pass"));
-        var readFile = (fs.readFileSync("pass.txt")).toString();
-        if (readFile == '') {
+        if (!fs.existsSync('./pass.txt')) {
             console.log("Run the command pass init")
         } else {
+            var readFile = (fs.readFileSync("pass.txt")).toString();
             const decryptedString = cryptr.decrypt(readFile);
             let data = JSON.parse(decryptedString);
             let pass = readlineSync.question("Password: ", {hideEchoBack: true});
@@ -62,10 +62,10 @@ yargs.command({
     },
     handler: function () {
         console.log(chalk.blue.bold("Pass"));
-        var readFile = (fs.readFileSync("pass.txt")).toString();
-        if (readFile == '') {
+        if (!fs.existsSync('./pass.txt')) {
             console.log("Run the command pass init")
         } else {
+            var readFile = (fs.readFileSync("pass.txt")).toString();
             const decryptedString = cryptr.decrypt(readFile);
             let data = JSON.parse(decryptedString);
             let pass = readlineSync.question("Password: ", {hideEchoBack: true});
@@ -95,10 +95,10 @@ yargs.command({
     builder: {
     },
     handler: function () {
-        if (readFile == '') {
+        console.log(chalk.blue.bold("Pass"));
+        if (!fs.existsSync('./pass.txt')) {
             console.log("Run the command pass init")
         } else {
-            console.log(chalk.blue.bold("Pass"));
             var readFile = (fs.readFileSync("pass.txt")).toString();
             const decryptedString = cryptr.decrypt(readFile);
             let data = JSON.parse(decryptedString);
@@ -126,10 +126,10 @@ yargs.command({
     },
     handler: function (argv) {
         console.log(chalk.blue.bold("Pass"));
-        var readFile = (fs.readFileSync("pass.txt")).toString();
-        if (readFile == '') {
+        if (!fs.existsSync('./pass.txt')) {
             console.log("Run the command pass init")
         } else {
+            var readFile = (fs.readFileSync("pass.txt")).toString();
             const decryptedString = cryptr.decrypt(readFile);
             let data = JSON.parse(decryptedString);
             let pass = readlineSync.question("Password: ", {hideEchoBack: true});
