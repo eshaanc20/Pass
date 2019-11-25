@@ -1,0 +1,20 @@
+{
+  "name": "pass",
+  "version": "1.0.0",
+  "description": "Save passwords using the terminal",
+  "main": "index.js",
+  "bin": {
+    "pass": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eshaan",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "file-encryptor": "^0.1.1",
+    "readline-sync": "^1.4.10",
+    "yargs": "^15.0.2"
+  }
+}
